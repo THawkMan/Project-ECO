@@ -6,7 +6,7 @@
     </title>
 
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="border animation.css">
+    <link rel="stylesheet" type="text/css" href="css.css">
 
     <style>
         * p {
@@ -163,24 +163,24 @@
             count: [0, 0, 0, 0, 0],
             income: [
                 1,
-                10,
-                30,
-                100,
-                400
+                5,
+                15,
+                50,
+                10
             ],
             cost: [
                 20,
-                150,
-                550,
-                3555,
-                50000
+                250,
+                800,
+                5000,
+                2500
             ],
 
             purchase: function (index) {
                 if (game.score >= this.cost[index]) {
                     game.score -= this.cost[index];
                     this.count[index]++;
-                    this.cost[index] = Math.ceil(this.cost[index] * 1.2)
+                    this.cost[index] = Math.ceil(this.cost[index] * 1.05)
                     display.updateScore();
                     display.updateShop();
                     display.updateUpgrades();
@@ -260,19 +260,19 @@
             ],
             cost: [
                 250,
-                600,
-                2500,
-                10000,
+                750,
+                2000,
+                15000,
                 35000,
-                133330,
+                90000,
                 200001,
                 500002,
                 2500003,
-                25000005,
+                15000005,
                 60000006,
                 500000007,
                 5000004,
-                750,
+                1500,
                 50000000
                 
             ],
@@ -303,12 +303,12 @@
                 5,
                 10,
                 15,
-                16,
                 25,
-                26,
-                66,
+                35,
+                50,
+                101,
                 1,
-                9999
+                999
             ],
             bonus: [
                 2,
@@ -317,15 +317,15 @@
                 2,
                 2,
                 2,
-                3,
-                3,
-                2,
-                5.5,
                 1.5,
+                2,
+                2.5,
                 5,
-                1000,
-                3,
-                333333
+                1.5,
+                5.5,
+                50000,
+                5,
+                33333
                 
             ],
             purchased: [false, false, false, false, false, false, false, false, false, false, false, false, false, false],
@@ -419,7 +419,7 @@
                 };
                 if (typeof savedGame.upgradePurchased !== "undefined") {
                     for (i = 0; i < savedGame.upgradePurchased.length; i++) {
-                        upgradePurchased[i] = savedGame.upgradePurchased[i];
+                        upgrade.purchased[i] = savedGame.upgradePurchased[i];
                     }
                 }
             }
@@ -439,10 +439,10 @@
         }, false);
 
         window.onload = function () {
-            //loadGame();
             display.updateScore();
             display.updateUpgrades();
             display.updateShop();
+            loadGame();
         };
 
         setInterval(function () {
