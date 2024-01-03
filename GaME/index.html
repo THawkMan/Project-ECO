@@ -96,7 +96,7 @@
     <button id="clicker" style="background-color: yellow; cursor: pointer; width: 150px; height: 40px;" class="unselectable"; >Eat Banana</button><br>
 
     <br>
-    <span id="scorePerSecond" ; style="color: aliceblue">0</span><span style="color: aliceblue">/sec</span>
+    <span id="scorePerSecond"; style="color: aliceblue">0</span><span style="color: aliceblue">/sec</span>
     <br>
     <p style="background-color: black; padding-bottom: 10px; padding-top: 20px; padding-left: 10px; text-align: left; border-radius: 10px;" class="unselectable">The more you click and the more primates you have the more upgrades pop up!!</p>
 
@@ -199,6 +199,7 @@
                 "Mecha - Gorilla",
                 "Ashen - Gorilla",
                 "Godsent - Gorilla",
+                "Enhancers - Gorilla",
                 "Yeti Modification - Bonobo",
                 "Easier-to-swallow bananas",
                 "Banana Devouring Anomaly"
@@ -212,10 +213,11 @@
                 "Gorilla Evolution - 1st Stage = Gorilla x 3",
                 "Gorilla Evolution - 2st Stage = Gorilla x 9",
                 "Gorilla Evolution - 3st Stage = Gorilla x 18",
-                "Gorilla Evolution - 3st Stage = Gorilla x 100",
+                "Gorilla Evolution - 4st Stage = Gorilla x 100",
+                "Gorilla Evolution - Pre 5st Stage = Gorilla x 150",
                 "Bonobo Yeti Modification - 1st Stage = Bonobo x 2000",
                 "More Bananas eaten on click",
-                "The one true Banana Devourer - Click + 996 Eaten"
+                "The one true Banana Devourer - Click + 9996 Eaten"
             ],
             image: [
                 "Upgrade1.jpg",
@@ -227,11 +229,13 @@
                 "Upgrade7.jpg",
                 "Upgrade8.jpg",
                 "Upgrade9.jpg",
+                "Upgrade10.jpg",
                 "UpgradeX.jpg",
                 "Upgrade99.jpg",
                 "Upgrade100.jpg"
             ],
             type: [
+                "monkey",
                 "monkey",
                 "monkey",
                 "monkey",
@@ -255,6 +259,7 @@
                 500002,
                 2500003,
                 50000005,
+                25000006,
                 5000004,
                 750,
                 50000000
@@ -265,6 +270,7 @@
                 1,
                 2,
                 3,
+                4,
                 4,
                 4,
                 4,
@@ -283,6 +289,7 @@
                 5,
                 10,
                 15,
+                16,
                 25,
                 66,
                 1,
@@ -298,12 +305,13 @@
                 3,
                 2,
                 5.55555555556,
+                1.5,
                 1000,
                 3,
                 333333
                 
             ],
-            purchased: [false, false, false, false, false, false, false, false, false, false, false],
+            purchased: [false, false, false, false, false, false, false, false, false, false, false, false],
 
             purchase: function (index) {
                 if (!this.purchased[index] && game.score >= this.cost[index]) {
