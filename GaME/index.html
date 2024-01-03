@@ -57,7 +57,7 @@
 
         #upgradeContainer img {
             height: 64px;
-            width: 64px;
+            width: 100px;
         }
     </style>
 
@@ -68,7 +68,7 @@
     <svg style="display: none;">
         <defs>
             <filter id="noise">
-                <feTurbulence baseFrequency="0.7,0.8"
+                <feTurbulence baseFrequency="0.7,0.9"
                               seed="0"
                               type="fractalNoise"
                               result="static">
@@ -111,7 +111,8 @@
           </div>
 
 
-        <p class="unselectable">Upgrade Shop</p>
+        <h2 class="unselectable">Upgrade Shop</h2>
+        <p class="unselectable">Hover to see more info!!</p>
 
         
 
@@ -179,7 +180,7 @@
                 if (game.score >= this.cost[index]) {
                     game.score -= this.cost[index];
                     this.count[index]++;
-                    this.cost[index] = Math.ceil(this.cost[index] * 1.15)
+                    this.cost[index] = Math.ceil(this.cost[index] * 1.2)
                     display.updateScore();
                     display.updateShop();
                     display.updateUpgrades();
@@ -194,12 +195,14 @@
                 "Better Instinct - Baboon",
                 "Better Instinct - Chimpanzee",
                 "Better Instinct - Orangutang",
+                "Nagging - Orangutang",
                 "Better Instinct - Gorilla",
                 "Warrior - Gorilla",
                 "Mecha - Gorilla",
                 "Ashen - Gorilla",
                 "Godsent - Gorilla",
                 "Enhancers - Gorilla",
+                "Fractal - Gorilla",
                 "Yeti Modification - Bonobo",
                 "Easier-to-swallow bananas",
                 "Banana Devouring Anomaly"
@@ -209,12 +212,14 @@
                 "Baboons eat bananas twice as fast",
                 "Chimpanzees eat bananas twice as fast",
                 "Orangutangs eat bananas twice as fast",
+                "Orangutang cool phase 1",
                 "Gorillas eat bananas twice as fast",
                 "Gorilla Evolution - 1st Stage = Gorilla x 3",
                 "Gorilla Evolution - 2st Stage = Gorilla x 9",
                 "Gorilla Evolution - 3st Stage = Gorilla x 18",
                 "Gorilla Evolution - 4st Stage = Gorilla x 100",
                 "Gorilla Evolution - Pre 5st Stage = Gorilla x 150",
+                "Gorilla Evolution - 5st Stage = Gorilla x 750",
                 "Bonobo Yeti Modification - 1st Stage = Bonobo x 2000",
                 "More Bananas eaten on click",
                 "The one true Banana Devourer - Click + 9996 Eaten"
@@ -224,17 +229,21 @@
                 "Upgrade2.jpg",
                 "Upgrade3.jpg",
                 "Upgrade4.jpg",
+                "Upgrade666.jpg",
                 "Upgrade5.jpg",
                 "Upgrade6.jpg",
                 "Upgrade7.jpg",
                 "Upgrade8.jpg",
                 "Upgrade9.jpg",
                 "Upgrade10.jpg",
+                "Upgrade11.jpg",
                 "UpgradeX.jpg",
                 "Upgrade99.jpg",
                 "Upgrade100.jpg"
             ],
             type: [
+                "monkey",
+                "monkey",
                 "monkey",
                 "monkey",
                 "monkey",
@@ -254,12 +263,14 @@
                 600,
                 2500,
                 10000,
+                35000,
                 133330,
                 200001,
                 500002,
                 2500003,
-                50000005,
-                25000006,
+                25000005,
+                60000006,
+                500000007,
                 5000004,
                 750,
                 50000000
@@ -270,6 +281,8 @@
                 1,
                 2,
                 3,
+                3,
+                4,
                 4,
                 4,
                 4,
@@ -285,12 +298,14 @@
                 1,
                 1,
                 1,
+                10,
                 1,
                 5,
                 10,
                 15,
                 16,
                 25,
+                26,
                 66,
                 1,
                 9999
@@ -301,17 +316,19 @@
                 2,
                 2,
                 2,
+                2,
                 3,
                 3,
                 2,
-                5.55555555556,
+                5.5,
                 1.5,
+                5,
                 1000,
                 3,
                 333333
                 
             ],
-            purchased: [false, false, false, false, false, false, false, false, false, false, false, false],
+            purchased: [false, false, false, false, false, false, false, false, false, false, false, false, false, false],
 
             purchase: function (index) {
                 if (!this.purchased[index] && game.score >= this.cost[index]) {
@@ -354,9 +371,9 @@
                 for (i = 0; i < upgrade.name.length; i++) {
                     if (!upgrade.purchased[i]) {
                         if (upgrade.type[i] == "monkey" && monkey.count[upgrade.monkeyIndex[i]] >= upgrade.req[i]) {
-                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'" style="margin:30px 0px 0px 5px; cursor: pointer;" class="box" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
+                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'"style="margin:30px 0px 0px 5px; cursor: pointer;" class="box" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
                         } else if (upgrade.type[i] == "click" && game.totalClicks >= upgrade.req[i]) {
-                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'" style="margin:30px 0px 0px 5px; cursor: pointer;" class="box" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
+                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'"style="margin:30px 0px 0px 5px; cursor: pointer;" class="box" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
                         }
                     }
                 }
