@@ -114,13 +114,16 @@
         <p>Auto save every 30 Seconds</p>
         <h2>Bananas eaten by Primates per sec:</h2>
         <span id="scorePerSecond" ; style="color: aliceblue">0</span><span style="color: aliceblue">/sec</span>
+
+
+        <div id="upgradeContainer">
+        </div>
     </div>
 
     <div>
         <div id="shopContainer">
         </div>
-        <div id="upgradeContainer">
-        </div>
+
     </div>
 
     <script>
@@ -160,9 +163,9 @@
             income: [
                 1,
                 10,
-                50,
+                30,
                 100,
-                500
+                400
             ],
             cost: [
                 20,
@@ -249,7 +252,7 @@
                 2500003,
                 5000004,
                 750,
-                100000000
+                50000000
                 
             ],
             monkeyIndex: [
@@ -335,9 +338,9 @@
                 for (i = 0; i < upgrade.name.length; i++) {
                     if (!upgrade.purchased[i]) {
                         if (upgrade.type[i] == "monkey" && monkey.count[upgrade.monkeyIndex[i]] >= upgrade.req[i]) {
-                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'" style="margin:10px; cursor: pointer;" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
+                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'" style="margin:30px 0px 0px 5px; cursor: pointer;" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
                         } else if (upgrade.type[i] == "click" && game.totalClicks >= upgrade.req[i]) {
-                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'" style="margin:10px; cursor: pointer;" class="box" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
+                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'" style="margin:30px 0px 0px 5px; cursor: pointer;" class="box" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
                         }
                     }
                 }
