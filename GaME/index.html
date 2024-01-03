@@ -1,4 +1,5 @@
-﻿<html>
+﻿<!DOCTYPE html> 
+<html>
 <head>
     <title>
         Eat Banana v0.07
@@ -92,14 +93,14 @@
     <button onclick="resetGame();" style="margin-bottom: 100px; float: right; cursor: pointer;" >Reset Progress</button>
     <h2 style="margin-top: 50px;">Bananas Eaten: <span id="score">0</span></h2>
 
-    <button id="clicker" style="background-color: yellow; cursor: pointer; width: 150px; height: 40px;" >Eat Banana</button><br>
+    <button id="clicker" style="background-color: yellow; cursor: pointer; width: 150px; height: 40px;" class="unselectable"; >Eat Banana</button><br>
 
     <br>
-    <p>--------------------------------------------------------------</p>
+    <span id="scorePerSecond" ; style="color: aliceblue">0</span><span style="color: aliceblue">/sec</span>
     <br>
-    <p style="background-color: black; padding-bottom: 10px; padding-top: 20px; padding-left: 10px; text-align: left;">The more you click and the more primates you have the more upgrades pop up!!</p>
+    <p style="background-color: black; padding-bottom: 10px; padding-top: 20px; padding-left: 10px; text-align: left; border-radius: 10px;" class="unselectable">The more you click and the more primates you have the more upgrades pop up!!</p>
 
-    <div style="float: right; background-color: black; padding: 20px;">
+    <div style="float: right; background-color: black; padding: 20px; border-radius: 10px; margin-top: 15px;">
 
 
         <div id="card">
@@ -110,10 +111,9 @@
           </div>
 
 
-        <p>Ctrl + S to Save!!</p>
-        <p>Auto save every 30 Seconds</p>
-        <h2>Bananas eaten by Primates per sec:</h2>
-        <span id="scorePerSecond" ; style="color: aliceblue">0</span><span style="color: aliceblue">/sec</span>
+        <p class="unselectable">Upgrade Shop</p>
+
+        
 
 
         <div id="upgradeContainer">
@@ -121,7 +121,7 @@
     </div>
 
     <div>
-        <div id="shopContainer">
+        <div id="shopContainer" class="unselectable">
         </div>
 
     </div>
@@ -198,6 +198,7 @@
                 "Warrior - Gorilla",
                 "Mecha - Gorilla",
                 "Ashen - Gorilla",
+                "Godsent - Gorilla",
                 "Yeti Modification - Bonobo",
                 "Easier-to-swallow bananas",
                 "Banana Devouring Anomaly"
@@ -211,6 +212,7 @@
                 "Gorilla Evolution - 1st Stage = Gorilla x 3",
                 "Gorilla Evolution - 2st Stage = Gorilla x 9",
                 "Gorilla Evolution - 3st Stage = Gorilla x 18",
+                "Gorilla Evolution - 3st Stage = Gorilla x 100",
                 "Bonobo Yeti Modification - 1st Stage = Bonobo x 2000",
                 "More Bananas eaten on click",
                 "The one true Banana Devourer - Click + 996 Eaten"
@@ -224,11 +226,13 @@
                 "Upgrade6.jpg",
                 "Upgrade7.jpg",
                 "Upgrade8.jpg",
+                "Upgrade9.jpg",
                 "UpgradeX.jpg",
                 "Upgrade99.jpg",
                 "Upgrade100.jpg"
             ],
             type: [
+                "monkey",
                 "monkey",
                 "monkey",
                 "monkey",
@@ -250,6 +254,7 @@
                 200001,
                 500002,
                 2500003,
+                50000005,
                 5000004,
                 750,
                 50000000
@@ -260,6 +265,7 @@
                 1,
                 2,
                 3,
+                4,
                 4,
                 4,
                 4,
@@ -277,6 +283,7 @@
                 5,
                 10,
                 15,
+                25,
                 66,
                 1,
                 9999
@@ -290,6 +297,7 @@
                 3,
                 3,
                 2,
+                5.55555555556,
                 1000,
                 3,
                 333333
@@ -338,7 +346,7 @@
                 for (i = 0; i < upgrade.name.length; i++) {
                     if (!upgrade.purchased[i]) {
                         if (upgrade.type[i] == "monkey" && monkey.count[upgrade.monkeyIndex[i]] >= upgrade.req[i]) {
-                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'" style="margin:30px 0px 0px 5px; cursor: pointer;" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
+                            document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'" style="margin:30px 0px 0px 5px; cursor: pointer;" class="box" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
                         } else if (upgrade.type[i] == "click" && game.totalClicks >= upgrade.req[i]) {
                             document.getElementById("upgradeContainer").innerHTML += '<img src="images/'+upgrade.image[i]+'" style="margin:30px 0px 0px 5px; cursor: pointer;" class="box" title="' + upgrade.name[i] + ' &#10; ' + upgrade.description[i] + ' &#10; ' + upgrade.cost[i] + ' Bananas Eaten" onclick="upgrade.purchase(' + i + ')">';
                         }
