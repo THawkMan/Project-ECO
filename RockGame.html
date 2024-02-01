@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Case Clicker</title>
+    <link rel="stylesheet" href="rocks.css">
+</head>
+<body>
+    <button id="clicker" onclick="game.addToScore(game.clickValue)">Money</button><br>
+    <br>
+    <div style="font-size: 24px;">Money: <span id="score" style="font-size: 24px;">0</span></div>
+
+    <button id="settings-button" onclick="toggleSettingsMenu()" style="float: right; position: absolute; bottom: 160px; right: 30px;">Settings</button>
+
+    <button onclick="saveGameButtonClick()" style="float: right;">Save Game</button>
+    <button onclick="resetGameProgress()" style="float: right;">Reset Progress</button><br><br>
+    <button onclick="rebirth()" style="float: right; position: absolute; right: 20px; top: 150px;" >Rebirth</button>
+    <h1 style="float: right; margin-top: 40px; position: absolute; right: 150px;"><span id="rebirths">0</span> Rebirths</h1>
+
+    <div id="buy-more-per-click" style="float: right; position: absolute; bottom: 40px; right: 30px; font-size: 20px;">
+        <button onclick="buyMoreMoneyPerClickUpgrade(1)">Buy More Money per Click</button>
+        <div id="used-rocks-info"></div>
+    </div>
+
+    <div id="rock-container">
+        <div id="rock" class="rock"></div>
+    </div>
+
+    <div id="result"></div>
+
+    <div id="perfect-rocks-count">Perfect Rocks: 0</div>
+    <div id="highest-value-rock">Highest Value Rock: None</div>
+
+    <div id="inventory-buttons">
+        <button onclick="sortInventory('rarity')">Sort by Rarity</button>
+        <button onclick="sortInventory('value')">Sort by Value</button>
+        <button onclick="openSellAllContextMenu(event);">Sell All</button>
+        <button onclick="sellNonPerfectRocks();">Sell Non-Perfect Rocks</button>
+    </div>
+
+    <div id="inventory"></div>
+
+    <div id="settings-menu">
+        <div>Background Color:</div>
+        <label><input type="radio" name="bgColor" value="red" onclick="changeBackgroundColor('red')"> Red</label>
+        <label><input type="radio" name="bgColor" value="green" onclick="changeBackgroundColor('green')"> Green</label>
+        <label><input type="radio" name="bgColor" value="blue" onclick="changeBackgroundColor('blue')"> Blue</label>
+        <label><input type="radio" name="bgColor" value="white" onclick="changeBackgroundColor('white')"> White</label>
+        <label><input type="radio" name="bgColor" value="purple" onclick="changeBackgroundColor('purple')"> Purple</label>
+        <label><input type="radio" name="bgColor" value="darkgray" onclick="changeBackgroundColor('darkgray')"> Dark Gray</label>
+        <label><input type="radio" name="bgColor" value="gold" onclick="changeBackgroundColor('gold')"> Gold</label>
+
+        <div>Custom Color:</div>
+        <input type="color" id="customColor" onchange="changeBackgroundColor(this.value)"><br>
+
+        <br>
+
+        <div>Custom Text Color:</div>
+        <input type="color" id="textOverrideColor"><br>
+        
+        <br>
+
+        <div>Auto Sell:</div>
+        <label><input type="checkbox" id="autoSellStone"> Auto Sell Stone</label>
+        <label><input type="checkbox" id="autoSellCoal"> Auto Sell Coal</label>
+        <label><input type="checkbox" id="autoSellBronze"> Auto Sell Bronze</label>
+        <label><input type="checkbox" id="autoSellIron"> Auto Sell Iron</label>
+        <label><input type="checkbox" id="autoSellSilver"> Auto Sell Silver</label>
+        <label><input type="checkbox" id="autoSellGold"> Auto Sell Gold</label>
+        <label><input type="checkbox" id="autoSellDiamond"> Auto Sell Diamond</label>
+        <label><input type="checkbox" id="autoSellJade"> Auto Sell Jade</label>
+        <label><input type="checkbox" id="autoSellDarkJade"> Auto Sell Dark Jade</label>
+        <label><input type="checkbox" id="autoSellWhiteJade"> Auto Sell White Jade</label>
+        <label><input type="checkbox" id="autoSellLavenderJade"> Auto Sell Lavender Jade</label>
+        
+        <!--<div>Other Settings:</div>-->
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.0/gsap.min.js"></script>
+    <script>
+
+        let autoSellConfig = {
+            Stone: false,
+            Coal: false,
+            Bronze: false,
+            Iron: false,
+            Silver: false,
+            Gold: false,
+            Diamond: false,
+            Jade: false,
+            DarkJade: false,
+            WhiteJade: false,
+            LavenderJade: false,
+        };
+
+        let buyMorePerClickUsed = {
+            upgrade1: [],
+            upgrade2: [],
+            upgrade3: [],
+        };
+        const rocks = [
+            { name: 'Stone', rarity: 'Common', probability: 0.5, baseValue: 1 },
+            { name: 'Coal', rarity: 'Uncommon', probability: 0.25, baseValue: 2 },
+            { name: 'Bronze', rarity: 'Unusual', probability: 0.1, baseValue: 5 },
+            { name: 'Iron', rarity: 'Remarkable', probability: 0.07, baseValue: 10 },
+            { name: 'Silver', rarity: 'Rare', probability: 0.045, baseValue: 20 },
+            { name: 'Gold', rarity: 'Outstanding', probability: 0.02, baseValue: 50 },
+            { name: 'Diamond', rarity: 'Exceptional', probability: 0.01, baseValue: 100 },
+            { name: 'Jade', rarity: 'Epic', probability: 0.0035, baseValue: 200 },
+            { name: 'Dark Jade', rarity: 'Legendary', probability: 0.00225, baseValue: 500 },
+            { name: 'White Jade', rarity: 'Divine', probability: 0.0007, baseValue: 1000 },
+            { name: 'Lavender Jade', rarity: 'Sacred', probability: 0.0002999, baseValue: 7000 },
+            { name: 'Black Opal', rarity: 'Absolute', probability: 0.000000095, baseValue: 100000 },
+            { name: 'D347H S70N3', rarity: 'UNKN0RWN', probability: 0.000000005, baseValue: 10000000 },
+        ];
+
+        let inventory = [];
+        let inventoryElement = document.getElementById('inventory');
+        let scoreElement = document.getElementById('score');
+
+        let openingCost = 25;
+
+        function getRandomValue(rarity) {
+            const rarityMultiplier = {
+                'Common': 1,
+                'Uncommon': 2,
+                'Unusual': 3,
+                'Remarkable': 3,
+                'Rare': 4,
+                'Outstanding': 5,
+                'Exceptional': 6,
+                'Epic': 6,
+                'Legendary': 12,
+                'Divine': 25,
+                'Sacred': 50,
+                'Absolute': 350,
+                'UNKN0RWN': 9999,
+            };
+
+            const rarityValue = rarityMultiplier[rarity] || 1;
+            baseValue = Math.ceil(Math.random() * 16);
+            const value = baseValue * rarityValue;
+
+            return value;
+        }
+
+        function sortInventory(property) {
+            inventory.sort((a, b) => {
+                const aIndex = rocks.findIndex((rock) => rock.name === a.name);
+                const bIndex = rocks.findIndex((rock) => rock.name === b.name);
+
+                if (property === 'rarity') {
+                    return aIndex - bIndex;
+                } else if (property === 'value') {
+                    return b.value - a.value;
+                }
+            });
+
+            updateInventory(inventoryElement);
+        }
+
+        function sellRock(rock) {
+            game.addToScore(rock.value);
+            removeFromInventory(rock);
+            display.updateScore();
+        }
+
+        function removeFromInventory(rock) {
+            const index = inventory.indexOf(rock);
+            inventory.splice(index, 1);
+            updateInventory(inventoryElement);
+        }
+
+        function updateInventory(inventoryElement) {
+            inventoryElement.innerHTML = '';
+
+            inventory.forEach((rock) => {
+                const inventoryRockElement = createInventoryRockElement(rock);
+                inventoryElement.appendChild(inventoryRockElement);
+            });
+            updatePerfectRocksCount();
+            updateHighestValueRock();
+        }
+
+        function createInventoryRockElement(rock) {
+            const inventoryRockElement = document.createElement('div');
+            inventoryRockElement.className = 'inventory-rock';
+            inventoryRockElement.title = `${rock.rarity} ${rock.name} - Value: ${rock.value}`;
+            inventoryRockElement.setAttribute('data-rarity', rock.rarity);
+
+            inventoryRockElement.style.background = `url(${getImageForRarity(rock.rarity)})`;
+            inventoryRockElement.style.backgroundSize = 'cover';
+
+            inventoryRockElement.addEventListener('contextmenu', (event) => {
+                event.preventDefault();
+                openInventoryRockContextMenu(event, rock);
+            });
+
+            const contentElement = document.createElement('div');
+            contentElement.textContent = rock.value;
+            contentElement.style.color = rock.value === calculateMaxValue(rock.rarity) ? getRandomColor() : 'black';
+            inventoryRockElement.appendChild(contentElement);
+
+            return inventoryRockElement;
+        }    
+
+        function getImageForRarity(rarity) {
+            switch (rarity) {
+                case 'Common':
+                    return 'url(C:\Project ECO\Rock Game\common-image.jpg)';
+                case 'Uncommon':
+                    return 'url(Uncommon-image.jpg)';
+                case 'Unusual':
+                    return 'url(Unusual-image.jpg)';
+                case 'Remarkable':
+                    return 'url(Remarkable-image.jpg)';
+                case 'Rare':
+                    return 'url(Rare-image.jpg)';
+                case 'Outstanding':
+                    return 'url(Outstanding-image.jpg)';
+                case 'Exceptional':
+                    return 'url(Exceptional-image.jpg)';
+                case 'Epic':
+                    return 'url(Epic-image.jpg)';
+                case 'Legendary':
+                    return 'url(Legendary-image.jpg)';
+                case 'Divine':
+                    return 'url(Divine-image.jpg)';
+                case 'Sacred':
+                    return 'url(Sacred-image.jpg)';
+                case 'Absolute':
+                    return 'url(Absolute-image.jpg)';
+                default:
+                    return '#ddd';
+            }
+        }
+
+        function openInventoryRockContextMenu(event, rock) {
+            const contextMenu = document.getElementById('inventory-rock-context-menu');
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = event.clientX + 'px';
+            contextMenu.style.top = event.clientY + 'px';
+
+            const contextMenuContent = document.getElementById('inventory-rock-context-menu-content');
+            contextMenuContent.innerHTML = `<div>${rock.rarity} ${rock.name}</div><div>Value: ${rock.value}</div>`;
+
+            if (rock.value === calculateMaxValue(rock.rarity)) {
+                const perfectText = document.createElement('div');
+                perfectText.textContent = 'Perfect';
+                perfectText.style.fontSize = '24px';
+                perfectText.style.textAlign = 'center';
+                contextMenuContent.appendChild(perfectText);
+
+                setInterval(() => {
+                    const randomColor = getRandomColor();
+                    perfectText.style.color = randomColor;
+                    updateInventory(inventoryElement);
+                }, 80);
+            }
+
+            const sellButton = document.getElementById('sell-inventory-rock-button');
+            sellButton.onclick = function () {
+                sellRock(rock);
+                contextMenu.style.display = 'none';
+            };
+
+            document.addEventListener('click', closeInventoryRockContextMenu);
+        }
+
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function closeInventoryRockContextMenu(event) {
+            const contextMenu = document.getElementById('inventory-rock-context-menu');
+            if (contextMenu.style.display === 'block' && !contextMenu.contains(event.target)) {
+                contextMenu.style.display = 'none';
+                document.removeEventListener('click', closeInventoryRockContextMenu);
+            }
+        }
+        
+        function selectRandomRock(rockList) {
+            const totalProbability = rockList.reduce((acc, rock) => acc + rock.probability, 0);
+            const randomThreshold = Math.random() * totalProbability;
+
+            let cumulativeProbability = 0;
+
+            return rockList.map(rock => {
+                cumulativeProbability += rock.probability;
+
+                if (randomThreshold <= cumulativeProbability) {
+                    const value = getRandomValue(rock.rarity);
+                    return { ...rock, value: value };
+                }
+
+                return null;
+            }).filter(Boolean);
+        }
+
+        function getRandomRarity() {
+            const rarities = ['Common', 'Uncommon', 'Unusual', 'Remarkable', 'Rare', 'Outstanding', 'Exceptional', 'Epic', 'Legendary', 'Divine', 'Sacred'];
+            const randomIndex = Math.floor(Math.random() * rarities.length);
+            return rarities[randomIndex];
+        }
+
+        const rockElement = document.getElementById('rock');
+        rockElement.addEventListener('click', openRock);
+
+        var game = {
+            score: 0,
+            totalScore: 0,
+            totalClicks: 0,
+            clickValue: 1,
+            version: 0.000,
+
+            addToScore: function (amount) {
+                this.score += amount;
+                this.totalScore += amount;
+                display.updateScore();
+            }
+
+        };
+
+        var display = {
+            updateScore: function () {
+                scoreElement.textContent = game.score;
+                document.title = game.score + " Money";
+            }
+        };
+
+        function openRock() {
+            if (game.score >= openingCost) {
+                game.addToScore(-openingCost);
+
+                const rockElement = document.getElementById('rock');
+                const resultElement = document.getElementById('result');
+                const inventoryElement = document.getElementById('inventory');
+
+                gsap.to(rockElement, {
+                    duration: 1,
+                    rotation: 360,
+                    onComplete: () => {
+                        const selectedRocks = selectRandomRock(rocks);
+                        const selectedRock = selectedRocks[0];
+
+                        if (selectedRock && selectedRock.name) {
+                            const rock = selectedRock.name;
+                            const rarity = selectedRock.rarity;
+                            const value = selectedRock.value;
+
+                            rockElement.setAttribute('data-rarity', rarity);
+
+                            resultElement.textContent = `You got a ${rarity} ${rock}! - Value: ${value}`;
+
+                            inventory.push({ ...selectedRock, value: value });
+
+                            checkAndSellRock({ name: rock, value: value });
+
+                            updateInventory(inventoryElement);
+
+                            setTimeout(() => {
+                                resultElement.textContent = '';
+                            }, 3000);
+                        } else {
+                            console.error('Error: Selected rock is undefined or does not have a name property.');
+                            console.log('Selected Rocks:', selectedRocks);
+                            console.log('Selected Rock:', selectedRock);
+                        }
+
+                        gsap.to(rockElement, {
+                            duration: 0,
+                            rotation: 0,
+                        });
+                    },
+                });
+            } else {
+                alert("Not enough money to open a rock!");
+            }
+        }
+
+        function checkAndSellRock(rock) {
+            if (autoSellConfig[rock.name]) {
+                sellRock(rock);
+            }
+        };
+
+        function openRockContextMenu(event, rock) {
+            event.preventDefault();
+            const contextMenuContent = document.getElementById('rock-context-menu-content');
+            contextMenuContent.innerHTML = `<div>${rock.rarity} ${rock.name}</div><div>Value: ${rock.value}</div>`;
+
+            if (rock.value === calculateMaxValue(rock.rarity)) {
+                const perfectText = document.createElement('div');
+                perfectText.textContent = 'Perfect';
+                perfectText.style.fontSize = '24px';
+                perfectText.style.color = 'red';
+                perfectText.style.textAlign = 'center';
+                contextMenuContent.appendChild(perfectText);
+            }
+
+            const sellButton = document.getElementById('sell-button');
+            sellButton.onclick = function () {
+                sellRock(rock);
+                contextMenu.style.display = 'none';
+            };
+
+            document.addEventListener('click', closeContextMenu);
+        }
+
+        function sellNonPerfectRocks() {
+            const nonPerfectRocks = inventory.filter(rock => rock.value !== calculateMaxValue(rock.rarity));
+            nonPerfectRocks.forEach(rock => sellRock(rock));
+        }
+
+        function closeContextMenu(event) {
+            const contextMenu = document.getElementById('rock-context-menu');
+            if (contextMenu.style.display === 'block' && !contextMenu.contains(event.target)) {
+                contextMenu.style.display = 'none';
+                document.removeEventListener('click', closeContextMenu);
+            }
+        }
+
+        function closeContextMenu(event) {
+            const contextMenu = document.getElementById('rock-context-menu');
+            if (!contextMenu.contains(event.target)) {
+                contextMenu.style.display = 'none';
+                document.removeEventListener('click', closeContextMenu);
+            }
+        }
+
+        document.body.addEventListener('click', closeContextMenu);
+
+
+        function calculateMaxValue(rarity) {
+            const rarityMultiplier = {
+                'Common': 16,
+                'Uncommon': 32,
+                'Unusual': 48,
+                'Remarkable': 48,
+                'Rare': 64,
+                'Outstanding': 80,
+                'Exceptional': 96,
+                'Epic': 96,
+                'Legendary': 192,
+                'Divine': 400,
+                'Sacred': 800,
+                'Absolute': 5600,
+                'UNKN0RWN': 159984,
+            };
+        return rarityMultiplier[rarity] || 1;
+        }
+
+        function buyMoreMoneyPerClickUpgrade(upgradeNumber) {
+            const upgradeCosts = [100, 1000, 300];
+            const upgradeCost = upgradeCosts[upgradeNumber - 1];
+
+            if (game.score >= upgradeCost) {
+                const availableRocks = getAvailableRocksForUpgrade(upgradeNumber);
+
+                if (availableRocks.length > 0) {
+                    const selectedRock = availableRocks[0];
+                    const rockType = selectedRock.name;
+
+                    // Check if buyMorePerClickUsed[`upgrade${upgradeNumber}`] is undefined, and initialize it if needed
+                    if (!buyMorePerClickUsed[`upgrade${upgradeNumber}`]) {
+                        buyMorePerClickUsed[`upgrade${upgradeNumber}`] = [];
+                    }
+
+                    if (!hasRockTypeBeenUsedForUpgrade(rockType, upgradeNumber)) {
+                        buyMorePerClickUsed[`upgrade${upgradeNumber}`].push(selectedRock);
+                        removeFromInventory(selectedRock);
+
+                        game.addToScore(-upgradeCost);
+
+                        applyMoreMoneyPerClickUpgrade(selectedRock, upgradeNumber);
+
+                        alert(`You bought More Money Per Click Upgrade ${upgradeNumber} using ${selectedRock.rarity} ${selectedRock.name}!`);
+
+                        updateInventory(inventoryElement);
+                        display.updateScore();
+                        displayUsedRocksInfo();
+                    } else {
+                        alert(`Upgrade ${upgradeNumber} has already been purchased for ${selectedRock.rarity} ${selectedRock.name}.`);
+                    }
+                } else {
+                    alert(`No available rocks for More Money Per Click Upgrade ${upgradeNumber}.`);
+                }
+            } else {
+                alert(`Not enough money to buy More Money Per Click Upgrade ${upgradeNumber}!`);
+            }
+        }
+
+        function hasRockTypeBeenUsedForUpgrade(rockType, upgradeNumber) {
+            const usedRocks = buyMorePerClickUsed[`upgrade${upgradeNumber}`] || [];
+            return usedRocks.some(rock => rock.name === rockType);
+        }
+
+        function displayUsedRocksInfo() {
+            const usedRocksInfo = document.getElementById('used-rocks-info');
+            usedRocksInfo.innerHTML = '';
+
+            for (let i = 1; i <= 3; i++) {
+                const upgradeUsedRocks = buyMorePerClickUsed[`upgrade${i}`];
+                if (upgradeUsedRocks && upgradeUsedRocks.length > 0) {
+                    const upgradeInfo = document.createElement('div');
+                    const usedRockNames = upgradeUsedRocks
+                        .map(rock => `${rock.name}`)
+                        .join(', ');
+
+                    upgradeInfo.textContent = `Upgrade ${i}: Used rocks - ${usedRockNames}`;
+                    usedRocksInfo.appendChild(upgradeInfo);
+                }
+            }
+        }
+
+        function getAvailableRocksForUpgrade(upgradeNumber) {
+            return inventory.filter((rock, index) => {
+                const isPerfectRock = rock.value === calculateMaxValue(rock.rarity);
+                const isUsedForUpgrade = buyMorePerClickUsed[`upgrade${upgradeNumber}`]?.some(usedRock => usedRock.name === rock.name);
+
+                return isPerfectRock && !isUsedForUpgrade;
+            });
+        }
+
+        function applyMoreMoneyPerClickUpgrade(rock, upgradeNumber) {
+            switch (upgradeNumber) {
+                case 1:
+                case 2:
+                case 3:
+                    game.clickValue += 1;
+                    break;
+            }
+        }
+
+
+        function openSellAllContextMenu(event) {
+            const contextMenu = document.getElementById('sell-all-context-menu');
+            if (contextMenu) {
+                contextMenu.style.display = 'block';
+                contextMenu.style.left = event.clientX + 'px';
+                contextMenu.style.top = event.clientY + 'px';
+
+                document.addEventListener('mousedown', sellAllContextMenuClickHandler);
+            }
+        }
+
+        function sellAllContextMenuClickHandler(event) {
+            const contextMenu = document.getElementById('sell-all-context-menu');
+            if (!contextMenu.contains(event.target)) {
+                contextMenu.style.display = 'none';
+                document.removeEventListener('mousedown', sellAllContextMenuClickHandler);
+            }
+        }
+
+        function closeContextMenu(event) {
+            const contextMenu = document.getElementById('rock-context-menu');
+            if (contextMenu && contextMenu.style.display === 'block' && !contextMenu.contains(event.target)) {
+                contextMenu.style.display = 'none';
+                document.removeEventListener('click', closeContextMenu);
+            }
+        }
+
+        function sellAllRocksByRarity(rarity) {
+            const rocksToSell = inventory.filter((rock) => rock.rarity === rarity);
+            rocksToSell.forEach((rock) => sellRock(rock));
+        }
+
+        function sellAllSubContextMenuClickHandler(event) {
+            const subContextMenu = document.getElementById('sell-all-sub-context-menu');
+            if (!subContextMenu.contains(event.target)) {
+                subContextMenu.style.display = 'none';
+                document.removeEventListener('mousedown', sellAllSubContextMenuClickHandler);
+            }
+        }
+
+        function sellAllRocksByType(rockType) {
+            const rocksToSell = inventory.filter((rock) => rock.name === rockType);
+            rocksToSell.forEach((rock) => sellRock(rock));
+        }
+
+        const subContextMenuDiv = document.createElement('div');
+        subContextMenuDiv.id = 'sell-all-sub-context-menu';
+        subContextMenuDiv.style.display = 'none';
+        subContextMenuDiv.style.position = 'absolute';
+        subContextMenuDiv.style.background = '#ffffff';
+        subContextMenuDiv.style.border = '1px solid #ccc';
+        subContextMenuDiv.style.padding = '10px';
+        document.body.appendChild(subContextMenuDiv);
+
+        function updatePerfectRocksCount() {
+            const perfectRocksCount = inventory.filter(rock => rock.value === calculateMaxValue(rock.rarity)).length;
+            const perfectRocksCountElement = document.getElementById('perfect-rocks-count');
+            perfectRocksCountElement.textContent = `Perfect Rocks: ${perfectRocksCount}`;
+        }
+
+        function updateHighestValueRock() {
+            const highestValueRock = inventory.reduce((acc, rock) => (rock.value > acc.value ? rock : acc), { value: 0 });
+            const highestValueRockElement = document.getElementById('highest-value-rock');
+            highestValueRockElement.textContent = `Highest Value Rock: ${highestValueRock.name} (${highestValueRock.value})`;
+        }
+
+        function saveGame() {
+            const saveData = {
+                score: game.score,
+                totalScore: game.totalScore,
+                totalClicks: game.totalClicks,
+                clickValue: game.clickValue,
+                inventory: inventory,
+                rocks: rocks.map(rock => ({ ...rock, baseValue: rock.value })),
+                buyMorePerClickUsed: buyMorePerClickUsed,  
+                upgrades: buyMorePerClickUsed, 
+                rebirths: rebirths,
+            };
+            localStorage.setItem('rockGameSave', JSON.stringify(saveData));
+        }
+
+        setInterval(function () {
+            saveGame();
+        }, 60000);
+
+
+        function loadGame() {
+            const savedData = localStorage.getItem('rockGameSave');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+
+                game.score = parsedData.score;
+                game.totalScore = parsedData.totalScore;
+                game.totalClicks = parsedData.totalClicks;
+                game.clickValue = parsedData.clickValue;
+                inventory = parsedData.inventory;
+                buyMorePerClickUsed = parsedData.buyMorePerClickUsed || {};
+                game.rebirths = parsedData.rebirths;
+
+                rocks.forEach(rock => {
+                    const savedRock = parsedData.rocks.find(savedRock => savedRock.name === rock.name);
+                    if (savedRock) {
+                        rock.value = savedRock.baseValue;
+                    }
+                });
+
+                gameUpgrades = parsedData.upgrades || buyMorePerClickUsed;
+
+                updateInventory(inventoryElement);
+                display.updateScore();
+                displayUsedRocksInfo();
+            }
+        }
+
+        loadGame();
+
+        function saveGameButtonClick() {
+            saveGame();
+            alert('Game saved!');
+        }
+
+        function resetGameProgress() {
+            if (confirm("Are you sure you want to reset your progress? This action cannot be undone.")) {
+                localStorage.removeItem('rockGameSave');
+                location.reload();
+            }
+        }
+
+        function toggleSettingsMenu() {
+            const settingsMenu = document.getElementById('settings-menu');
+            settingsMenu.style.display = settingsMenu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function getContrastRatio(color1, color2) {
+            const luminance1 = getRelativeLuminance(color1);
+            const luminance2 = getRelativeLuminance(color2);
+
+            const brighter = Math.max(luminance1, luminance2);
+            const darker = Math.min(luminance1, luminance2);
+
+            return (brighter + 0.05) / (darker + 0.05);
+        }
+
+        function getRelativeLuminance(color) {
+            const rgb = parseColor(color);
+            const srgb = rgb.map(val => {
+                val /= 255;
+                return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+            });
+
+            return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+        }
+
+        function parseColor(color) {
+            const hex = color.replace(/^#/, '');
+            return [
+                parseInt(hex.substring(0, 2), 16),
+                parseInt(hex.substring(2, 4), 16),
+                parseInt(hex.substring(4, 6), 16)
+            ];
+        }
+
+        function changeColor(color, element) {
+            const inverseColor = getInverseColor(color);
+            const contrastRatio = getContrastRatio(color, inverseColor);
+
+            if (contrastRatio < 4.5) {
+                element.style.color = inverseColor;
+            } else {
+                // If contrast is sufficient, revert to default color
+                element.style.color = '';
+            }
+        }
+
+
+        function changeBackgroundColor(color) {
+            document.body.style.backgroundColor = color;
+
+            const allTextElements = document.querySelectorAll('body *');
+            allTextElements.forEach(element => {
+                if (element.style.color !== '') {
+                    // Preserve existing text color if set in CSS
+                    return;
+                }
+
+                changeColor(color, element);
+            });
+        }
+
+
+        function getInverseColor(color) {
+            const hex = color.replace(/^#/, '');
+            const bigint = parseInt(hex, 16);
+            const r = (bigint >> 16) & 255;
+            const g = (bigint >> 8) & 255;
+            const b = bigint & 255;
+
+            const inverseR = 255 - r;
+            const inverseG = 255 - g;
+            const inverseB = 255 - b;
+
+            const inverseHex = `#${(inverseR << 16 | inverseG << 8 | inverseB).toString(16).padStart(6, '0')}`;
+            return inverseHex;
+        }
+
+        const customColorInput = document.getElementById('customColor');
+            customColorInput.addEventListener('input', function () {
+                const customColor = this.value;
+                changeBackgroundColor(customColor);
+            });
+
+
+            const predefinedColorRadios = document.querySelectorAll('input[name="bgColor"]');
+                predefinedColorRadios.forEach(radio => {
+                    radio.addEventListener('change', function () {
+                        if (this.checked) {
+                            const predefinedColor = this.value;
+                            changeBackgroundColor(predefinedColor);
+                        }
+                    });
+                });
+
+            const textOverrideColorInput = document.getElementById('textOverrideColor');
+                textOverrideColorInput.addEventListener('input', function () {
+                    const textColorOverride = this.value;
+                    changeTextColor(textColorOverride);
+                });
+
+        function changeTextColor(color) {
+            const allTextElements = document.querySelectorAll('body *');
+            allTextElements.forEach(element => {
+                element.style.color = color;
+            });
+        }
+
+        document.getElementById('autoSellStone').addEventListener('change', function () {
+            autoSellConfig.Stone = this.checked;
+        });
+
+        document.getElementById('autoSellCoal').addEventListener('change', function () {
+            autoSellConfig.Coal = this.checked;
+        });
+
+        document.getElementById('autoSellBronze').addEventListener('change', function () {
+            autoSellConfig.Bronze = this.checked;
+        });
+
+        document.getElementById('autoSellIron').addEventListener('change', function () {
+            autoSellConfig.Iron = this.checked;
+        });
+
+        document.getElementById('autoSellSilver').addEventListener('change', function () {
+            autoSellConfig.Silver = this.checked;
+        });
+
+        document.getElementById('autoSellGold').addEventListener('change', function () {
+            autoSellConfig.Gold = this.checked;
+        });
+
+        document.getElementById('autoSellDiamond').addEventListener('change', function () {
+            autoSellConfig.Diamond = this.checked;
+        });
+
+        document.getElementById('autoSellJade').addEventListener('change', function () {
+            autoSellConfig.Jade = this.checked;
+        });
+
+        document.getElementById('autoSellDarkJade').addEventListener('change', function () {
+            autoSellConfig.DarkJade = this.checked;
+        });
+
+        document.getElementById('autoSellWhiteJade').addEventListener('change', function () {
+            autoSellConfig.WhiteJade = this.checked;
+        });
+
+        document.getElementById('autoSellLavenderJade').addEventListener('change', function () {
+            autoSellConfig.LavenderJade = this.checked;
+        });
+
+        let rebirths = 0;
+
+        function rebirth() {
+            const blackOpalIndex = inventory.findIndex(rock => rock.name === 'Black Opal');
+
+            if (blackOpalIndex !== -1 && game.score >= rebirthCost) {
+                game.addToScore(-rebirthCost);
+                inventory.splice(blackOpalIndex, 1);
+
+                rebirths++;
+                increaseRockValuesAndProbabilities();
+                applyRebirthBonus();
+
+                alert(`Congratulations! You have rebirthed. Rebirths: ${rebirths}`);
+
+                resetBuyMorePerClickUsed();
+
+                rebirthCost = Math.ceil(rebirthCost * 2);
+
+                game.clickValue = 1;
+
+                game.score = 0;
+
+                const rebirthsAmountElement = document.getElementById('rebirths-count');
+                rebirthsAmountElement.textContent = rebirths;
+
+                const rebirthCostElement = document.getElementById('rebirth-cost');
+                rebirthCostElement.textContent = rebirthCost;
+
+                saveGame();
+
+                updateInventory(inventoryElement);
+                display.updateScore();
+            } else {
+                if (blackOpalIndex === -1) {
+                    alert("You need a Black Opal to rebirth!");
+                } else {
+                    alert("Not enough money to rebirth!");
+                }
+            }
+        }
+
+        function increaseRockValuesAndProbabilities() {
+            rocks.forEach(rock => {
+                rock.value += Math.ceil(rock.value * 0.05);
+                rock.probability += rock.probability * 0.05;
+            });
+        }
+
+        function applyRebirthBonus() {
+            rocks.forEach(rock => {
+                rock.value += Math.ceil(rock.value * 0.05);
+                rock.probability += rock.probability * 0.05;
+            });
+        }
+
+        function resetBuyMorePerClickUsed() {
+            buyMorePerClickUsed = {};
+            const usedRocksInfo = document.getElementById('used-rocks-info');
+            usedRocksInfo.innerHTML = '';
+        }
+
+    </script>
+
+<div id="inventory-rock-context-menu" class="context-menu" style="display: none; position: absolute; background: #ffffff; border: 1px solid #ccc; padding: 10px;">
+    <div id="inventory-rock-context-menu-content"></div>
+    <button id="sell-inventory-rock-button">Sell</button>
+</div>
+
+<div id="sell-all-context-menu" class="context-menu" style="display: none; position: absolute; background: #ffffff; border: 1px solid #ccc; padding: 10px;">
+
+    <div>Sell All Rocks by Type:</div>
+    <button onclick="sellAllRocksByType('Stone')">Stone</button>
+    <button onclick="sellAllRocksByType('Coal')">Coal</button>
+    <button onclick="sellAllRocksByType('Bronze')">Bronze</button>
+    <button onclick="sellAllRocksByType('Iron')">Iron</button>
+    <button onclick="sellAllRocksByType('Silver')">Silver</button>
+    <button onclick="sellAllRocksByType('Gold')">Gold</button>
+    <button onclick="sellAllRocksByType('Diamond')">Diamond</button>
+    <button onclick="sellAllRocksByType('Jade')">Jade</button>
+    <button onclick="sellAllRocksByType('Dark Jade')">Dark Jade</button>
+    <button onclick="sellAllRocksByType('White Jade')">White Jade</button>
+    <button onclick="sellAllRocksByType('Lavender Jade')">Lavender Jade</button>
+</div>
+
+</body>
+</html>
